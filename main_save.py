@@ -20,6 +20,7 @@ img_blank = None
 bb_prem_icon = [482, 470, 489, 477]
 bb_prem_name = [97, 470, 171, 477]
 prem_row_height = 25
+prem_num_rows = 13
 
 bb_rsa = None
 
@@ -76,9 +77,7 @@ def ReloadAndWait(window):
 
 
 def Wait(seconds):
-    sleep_time = random.randrange(10, 50)
-    print('waiting', str(seconds), 'seconds until next refresh')
-
+    print('waiting', str(seconds))
     target = time.time() + seconds
     while time.time() < target:
         if keyboard.is_pressed('p'):
@@ -89,14 +88,14 @@ def Wait(seconds):
 #if not then alert user
 #
 def MonitorWindow():
-    img_names = [0] * 13
-    img_icons = [0] * 13
-    img_names_last = [0] * 13
-    img_icons_last = [0] * 13
+    img_names = [0] * prem_num_rows
+    img_icons = [0] * prem_num_rows
+    img_names_last = [0] * prem_num_rows
+    img_icons_last = [0] * prem_num_rows
 
     num_refreshes = 0
 
-    for i in range(0, 13):
+    for i in range(0, prem_num_rows):
         img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
         img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
 
@@ -105,7 +104,7 @@ def MonitorWindow():
         linesfound = []
         img_names_last = img_names.copy()
         img_icons_last = img_icons.copy()
-        for i in range(0, 13):
+        for i in range(0, prem_num_rows):
             img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
             img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
 
@@ -131,17 +130,13 @@ def MonitorWindow():
         if play_alert:
             Alert('Premium Trip Found on line(s) {}.'.format(str(linesfound)))
 
-        sleep_time = random.randrange(10, 50)
-        print('waiting', str(sleep_time), 'seconds until next refresh')
-        time.sleep(sleep_time)
+        Wait(random.randrange(10, 50))
         ReloadAndWait(0)
 
         num_refreshes = num_refreshes + 1
 
         if num_refreshes % 5 == 0:
-            sleep_time = random.randrange(10, 50)
-            print('waiting', str(sleep_time), 'seconds until next refresh')
-            time.sleep(sleep_time)
+            Wait(random.randrange(10, 50))
             pyautogui.click(loc_reload[1])
             pyautogui.click(loc_mousehide)
 
@@ -150,10 +145,6 @@ def MonitorWindow():
 #==== main ====
 state = "MONITORING"
 
-
-while True:
-    Wait(10)
-
 print("waiting 5 sec")
 time.sleep(5)
 print("starting")
@@ -161,7 +152,7 @@ print("starting")
 if night_cont:
     sbc.set_brightness(0)
 
-for i in range(0, 13):
+for i in range(0, prem_num_rows):
     ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('name_{}.png'.format(i))
     ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('icon_{}.png'.format(i))
 
@@ -183,22 +174,3 @@ screen_width, screen_height = pyautogui.size()
 #4 if it appears different from last capture alert user
 #5 wait for input and possibly move search area in order to avoid alerting twice
 ## monitor larger region and determine where change occurs, this allows blacklisting trips
-
-
-
-
-
-##while True:
-##    time.sleep(2)
-##    pyautogui.moveTo(50, 50)
-##
-##while True:
-##    sc_last = sc
-##    sc = ImageGrab.grab(bbox=bb_region_1)
-##    if sc_last != sc:
-##        print("ahhh")
-
-
-
-
-#winsound.Beep(1000, 100)#halts program, can be avoided by using a sound file

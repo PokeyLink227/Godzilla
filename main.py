@@ -5,6 +5,7 @@ import time
 import pyautogui
 import random
 import screen_brightness_control as sbc
+import keyboard
 
 
 night_cont = True
@@ -19,6 +20,7 @@ img_blank = None
 bb_prem_name = [99, 482, 181, 488]
 bb_prem_icon = [530, 482, 540, 488]
 prem_row_height = 25
+prem_num_rows = 9
 
 
 bb_rsa = None
@@ -35,19 +37,27 @@ def IndexOfImage(imageArray, img):
             return i
     return -1
 
-def AskUser():
-    return 0
 
-def Alert(msg):
+def Pause():
+    print('[Paused]')
+    response = pyautogui.confirm(text='select option on how to continue', title='program paused', buttons=['continue', 'exit'])
+    if response == 'exit':
+        exit()
+
+def Alert(msg, silent=False):
     print('[Alert]', msg)
     sbc.set_brightness(30)
     winsound.PlaySound('alert_sound.wav', winsound.SND_LOOP|winsound.SND_ASYNC)
+
     response = pyautogui.confirm(text=msg, title='select option on how to continue', buttons=['continue', 'pause', 'exit'])
+
     winsound.PlaySound(None, 0)
+
     if response == 'pause':
-        response = pyautogui.confirm(text='select option on how to continue', title='program paused', buttons=['continue', 'exit'])
-    if response == 'exit':
+        Pause()
+    elif response == 'exit':
         exit()
+
     sbc.set_brightness(0)
 
 
@@ -67,18 +77,26 @@ def ReloadAndWait(window):
     return i > 10
 
 
+def Wait(seconds):
+    print('waiting', str(seconds))
+    target = time.time() + seconds
+    while time.time() < target:
+        if keyboard.is_pressed('p'):
+            Pause()
+        #time.sleep(0.5)
+
 #keep track of each rows id and premium status. each iteration retrieve new trip info then for each premium trip found check if it was present in last iteration
 #if not then alert user
 #
 def MonitorWindow():
-    img_names = [0] * 9
-    img_icons = [0] * 9
-    img_names_last = [0] * 9
-    img_icons_last = [0] * 9
+    img_names = [0] * prem_num_rows
+    img_icons = [0] * prem_num_rows
+    img_names_last = [0] * prem_num_rows
+    img_icons_last = [0] * prem_num_rows
 
     num_refreshes = 0
 
-    for i in range(0, 9):
+    for i in range(0, prem_num_rows):
         img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
         img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
 
@@ -87,7 +105,7 @@ def MonitorWindow():
         linesfound = []
         img_names_last = img_names.copy()
         img_icons_last = img_icons.copy()
-        for i in range(0, 9):
+        for i in range(0, prem_num_rows):
             img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
             img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
 
@@ -113,17 +131,13 @@ def MonitorWindow():
         if play_alert:
             Alert('Premium Trip Found on line(s) {}.'.format(str(linesfound)))
 
-        sleep_time = random.randrange(10, 50)
-        print('waiting', str(sleep_time), 'seconds until next refresh')
-        time.sleep(sleep_time)
+        Wait(random.randrange(10, 50))
         ReloadAndWait(0)
 
         num_refreshes = num_refreshes + 1
 
         if num_refreshes % 5 == 0:
-            sleep_time = random.randrange(10, 50)
-            print('waiting', str(sleep_time), 'seconds until next refresh')
-            time.sleep(sleep_time)
+            Wait(random.randrange(10, 50))
             pyautogui.click(loc_reload[1])
             pyautogui.click(loc_mousehide)
 
@@ -139,7 +153,7 @@ print("starting")
 if night_cont:
     sbc.set_brightness(0)
 
-for i in range(0, 9):
+for i in range(0, prem_num_rows):
     ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('name_{}.png'.format(i))
     ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('icon_{}.png'.format(i))
 
@@ -161,22 +175,3 @@ screen_width, screen_height = pyautogui.size()
 #4 if it appears different from last capture alert user
 #5 wait for input and possibly move search area in order to avoid alerting twice
 ## monitor larger region and determine where change occurs, this allows blacklisting trips
-
-
-
-
-
-##while True:
-##    time.sleep(2)
-##    pyautogui.moveTo(50, 50)
-##
-##while True:
-##    sc_last = sc
-##    sc = ImageGrab.grab(bbox=bb_region_1)
-##    if sc_last != sc:
-##        print("ahhh")
-
-
-
-
-#winsound.Beep(1000, 100)#halts program, can be avoided by using a sound file
