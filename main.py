@@ -1,33 +1,13 @@
+import json
+import time
+import random
+import winsound
+
 from PIL import ImageGrab
 from PIL import ImageChops
-import winsound
-import time
 import pyautogui
-import random
 import screen_brightness_control as sbc
 import keyboard
-
-
-night_cont = True
-
-# make icon godzilla eating airplane
-#name is godzilla
-# make icon bbox smller to make faster
-
-loc_mousehide = [50, 215]
-img_blank = None
-
-bb_prem_name = [99, 482, 181, 488]
-bb_prem_icon = [530, 482, 540, 488]
-prem_row_height = 25
-prem_num_rows = 9
-
-
-bb_rsa = None
-
-bb_reload = [[90, 55, 105, 75], None]
-img_reload_initial = [None, None]
-loc_reload = [[100, 65], [780, 65]]
 
 
 def IndexOfImage(imageArray, img):
@@ -113,7 +93,7 @@ def MonitorWindow():
             #just look for empty image. ned to make custom index of function to check for image equality.
             # row contains premium trip where it did not before
             if ImageChops.difference(img_blank, img_icons[i]).getbbox():
-                print('[Debug] Trip on row', str(i), 'is premium, previously found on row', end='')
+                print('[Debug] Trip on row', str(i), 'is premium, previously found on row ', end='')
                 img_old_index = IndexOfImage(img_names_last, img_names[i])
                 print(str(img_old_index))
                 # trip existed before but was not premium
@@ -149,12 +129,42 @@ print('[System] Waiting 5 seconds')
 time.sleep(5)
 print('[System] Performing setup')
 
+#set up variables
+night_cont = True
+img_reload_initial = [None, None]
+vertical_offset = 0
+loc_mousehide = [50, 295]
+img_blank = None
+bb_rsa = None
+
+#load config file
+with open('config.json', 'r') as file:
+    config = json.load(file)
+system_mode = config['mode']
+print('[System] Loading in {} mode'.format(system_mode))
+
+bb_reload = config[system_mode]['bb_reload']
+loc_reload = config[system_mode]['loc_reload']
+bb_vertprobe = config[system_mode]['bb_vertprobe']
+vertprobe_goal = config[system_mode]['vertprobe_goal']
+bb_prem_name = config[system_mode]['bb_prem_name']
+bb_prem_icon = config[system_mode]['bb_prem_icon']
+prem_row_height = config[system_mode]['prem_row_height']
+prem_num_rows = config[system_mode]['prem_num_rows']
+
+
+
+
 # find vertical offset
 img_vertprobe = ImageGrab.grab(bbox=bb_vertprobe)
 for y in range(0, 100):
     if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
         if y != vertprobe_goal:
             vertical_offset = y - vertprobe_goal
+            bb_prem_name[1] += vertical_offset
+            bb_prem_name[3] += vertical_offset
+            bb_prem_icon[1] += vertical_offset
+            bb_prem_icon[3] += vertical_offset
         break
 
 
@@ -162,14 +172,14 @@ if night_cont:
     sbc.set_brightness(0)
 
 for i in range(0, prem_num_rows):
-    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i + vertical_offset, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i + vertical_offset)).save('debug/name_{}.png'.format(i))
-    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i + vertical_offset, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i + vertical_offset)).save('debug/icon_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('debug/name_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('debug/icon_{}.png'.format(i))
 
 pyautogui.click(loc_mousehide)
 
 
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0]) # might need to account for window being focused or not
-img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0] + 100, bb_prem_icon[1], bb_prem_icon[2] + 100, bb_prem_icon[3]))
+img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0] + 50, bb_prem_icon[1], bb_prem_icon[2] + 50, bb_prem_icon[3]))
 img_blank.save('debug/blank.png')
 
 print('[System] Setup complete')
