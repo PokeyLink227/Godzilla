@@ -153,15 +153,15 @@ if night_cont:
     sbc.set_brightness(0)
 
 for i in range(0, prem_num_rows):
-    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('name_{}.png'.format(i))
-    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('icon_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('debug/name_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('debug/icon_{}.png'.format(i))
 
 pyautogui.click(loc_mousehide)
 
 
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0]) # might need to account for window being focused or not
 img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0]+100, bb_prem_icon[1], bb_prem_icon[2]+100, bb_prem_icon[3]))
-img_blank.save('blank.png')
+img_blank.save('debug/blank.png')
 MonitorWindow()
 
 
