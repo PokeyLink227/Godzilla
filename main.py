@@ -30,7 +30,6 @@ img_reload_initial = [None, None]
 loc_reload = [[100, 65], [780, 65]]
 
 
-#make loop index range non static
 def IndexOfImage(imageArray, img):
     for i in range(len(imageArray)):
         if not ImageChops.difference(img, imageArray[i]).getbbox():
@@ -39,8 +38,8 @@ def IndexOfImage(imageArray, img):
 
 
 def Pause():
-    print('[Paused]')
-    response = pyautogui.confirm(text='select option on how to continue', title='program paused', buttons=['continue', 'exit'])
+    print('[System] Program paused')
+    response = pyautogui.confirm(text='Select option on how to continue', title='Program paused', buttons=['Continue', 'Exit'])
     if response == 'exit':
         exit()
 
@@ -49,7 +48,7 @@ def Alert(msg, silent=False):
     sbc.set_brightness(30)
     winsound.PlaySound('alert_sound.wav', winsound.SND_LOOP|winsound.SND_ASYNC)
 
-    response = pyautogui.confirm(text=msg, title='select option on how to continue', buttons=['continue', 'pause', 'exit'])
+    response = pyautogui.confirm(text=msg, title='Select option on how to continue', buttons=['Continue', 'Pause', 'Exit'])
 
     winsound.PlaySound(None, 0)
 
@@ -63,14 +62,16 @@ def Alert(msg, silent=False):
 
 #reload and wait page on left or right of screen (0, 1), return True or False if successful
 def ReloadAndWait(window):
-    print('reloading')
+    print('[System] Reloading {} window'.format('Premium' if window == 0 else 'Rsa'))
     pyautogui.click(loc_reload[window])
     time.sleep(0.5)
     pyautogui.moveTo(loc_mousehide)
 
     i = 6000
-    while not ImageGrab.grab(bbox=bb_reload[window]) == img_reload_initial[window] and i > 0:
-        print("Page not loaded yet, waiting ", str(i), " more seconds.")
+
+    time.sleep(0.5)
+    while ImageChops.difference(ImageGrab.grab(bbox=bb_reload[window]), img_reload_initial[window]).getbbox() and i > 0:
+        print('[System] {} window has not loaded yet, waiting'.format('Premium' if window == 0 else 'Rsa'), str(i), 'more seconds')
         i -= 1
         time.sleep(1)
 
@@ -78,7 +79,7 @@ def ReloadAndWait(window):
 
 
 def Wait(seconds):
-    print('waiting', str(seconds))
+    print('[System] Waiting', str(seconds), 'seconds')
     target = time.time() + seconds
     while time.time() < target:
         if keyboard.is_pressed('p'):
@@ -112,9 +113,9 @@ def MonitorWindow():
             #just look for empty image. ned to make custom index of function to check for image equality.
             # row contains premium trip where it did not before
             if ImageChops.difference(img_blank, img_icons[i]).getbbox():
-                print('trip on row', str(i), 'prem')
+                print('[Debug] Trip on row', str(i), 'is premium, previously found on row', end='')
                 img_old_index = IndexOfImage(img_names_last, img_names[i])
-                print('old index:', str(img_old_index))
+                print(str(img_old_index))
                 # trip existed before but was not premium
                 if img_old_index > -1:
                     if not ImageChops.difference(img_icons_last[img_old_index], img_blank).getbbox():
@@ -129,7 +130,7 @@ def MonitorWindow():
                     #Alert("New Premium trip added")
 
         if play_alert:
-            Alert('Premium Trip Found on line(s) {}.'.format(str(linesfound)))
+            Alert('Premium trip found on line(s) {}'.format(str(linesfound)))
 
         Wait(random.randrange(10, 50))
         ReloadAndWait(0)
@@ -144,34 +145,35 @@ def MonitorWindow():
 
 
 #==== main ====
-state = "MONITORING"
-
-print("waiting 5 sec")
+print('[System] Waiting 5 seconds')
 time.sleep(5)
-print("starting")
+print('[System] Performing setup')
+
+# find vertical offset
+img_vertprobe = ImageGrab.grab(bbox=bb_vertprobe)
+for y in range(0, 100):
+    if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
+        if y != vertprobe_goal:
+            vertical_offset = y - vertprobe_goal
+        break
+
 
 if night_cont:
     sbc.set_brightness(0)
 
 for i in range(0, prem_num_rows):
-    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('debug/name_{}.png'.format(i))
-    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('debug/icon_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i + vertical_offset, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i + vertical_offset)).save('debug/name_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i + vertical_offset, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i + vertical_offset)).save('debug/icon_{}.png'.format(i))
 
 pyautogui.click(loc_mousehide)
 
 
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0]) # might need to account for window being focused or not
-img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0]+50, bb_prem_icon[1], bb_prem_icon[2]+50, bb_prem_icon[3]))
+img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0] + 100, bb_prem_icon[1], bb_prem_icon[2] + 100, bb_prem_icon[3]))
 img_blank.save('debug/blank.png')
+
+print('[System] Setup complete')
 MonitorWindow()
 
 
-screen_width, screen_height = pyautogui.size()
-
-## main monitoring loop is
-#1 reload page
-#2 wait for page to fully load
-#3 take capture of premium icon location
-#4 if it appears different from last capture alert user
-#5 wait for input and possibly move search area in order to avoid alerting twice
-## monitor larger region and determine where change occurs, this allows blacklisting trips
+#==== end of program ====
