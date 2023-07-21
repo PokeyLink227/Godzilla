@@ -29,7 +29,6 @@ img_reload_initial = [None, None]
 loc_reload = [[87, 61], [1047, 61]]
 
 
-#make loop index range non static
 def IndexOfImage(imageArray, img):
     for i in range(len(imageArray)):
         if not ImageChops.difference(img, imageArray[i]).getbbox():
