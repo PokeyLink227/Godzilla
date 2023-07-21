@@ -5,6 +5,7 @@ import time
 import pyautogui
 import random
 import screen_brightness_control as sbc
+import keyboard
 
 
 night_cont = True
@@ -13,28 +14,19 @@ night_cont = True
 #name is godzilla
 # make icon bbox smller to make faster
 
-loc_mousehide = [55, 265]
+loc_mousehide = [50, 295]
 img_blank = None
 
-bb_prem_icon = [584, [596, 627, 658, 689, 721, 752, 783, 814, 846, 877, 908, 939, 971], 623, [625, 656, 687, 718, 750, 781, 812, 843, 875, 906, 937, 968, 1000]]
-bb_prem_name = [109, [604, 635, 666, 698, 729, 760, 791, 823, 854, 885, 916, 948, 979], 213, [616, 647, 678, 710, 741, 772, 803, 835, 866, 897, 928, 960, 991]]
-prem_row_height = 32
-
-[616, 647, 678, 710, 741, 772, 803, 835, 866, 897, 928, 960, 991]
+bb_prem_icon = [482, 470, 489, 477]
+bb_prem_name = [97, 470, 171, 477]
+prem_row_height = 25
 
 bb_rsa = None
 
-bb_reload = [[100, 65, 120, 85], None]
+bb_reload = [[80, 54, 94, 68], [1040, 54, 1054, 68]]
 img_reload_initial = [None, None]
-loc_reload = [[110, 75], None]
+loc_reload = [[87, 61], [1047, 61]]
 
-
-def SetUpScreen():
-    #moves a window from top to split
-    time.sleep(5)
-    pyautogui.moveTo(screen_width / 2, 10)
-    time.sleep(1)
-    pyautogui.dragTo(0, screen_height / 2, 1, button='left')
 
 #make loop index range non static
 def IndexOfImage(imageArray, img):
@@ -43,26 +35,34 @@ def IndexOfImage(imageArray, img):
             return i
     return -1
 
-def AskUser():
-    return 0
 
-def Alert(msg):
+def Pause():
+    print('[Paused]')
+    response = pyautogui.confirm(text='select option on how to continue', title='program paused', buttons=['continue', 'exit'])
+    if response == 'exit':
+        exit()
+
+def Alert(msg, silent=False):
     print('[Alert]', msg)
     sbc.set_brightness(30)
     winsound.PlaySound('alert_sound.wav', winsound.SND_LOOP|winsound.SND_ASYNC)
+
     response = pyautogui.confirm(text=msg, title='select option on how to continue', buttons=['continue', 'pause', 'exit'])
+
     winsound.PlaySound(None, 0)
+
     if response == 'pause':
-        response = pyautogui.confirm(text='select option on how to continue', title='program paused', buttons=['continue', 'exit'])
-    if response == 'exit':
+        Pause()
+    elif response == 'exit':
         exit()
+
     sbc.set_brightness(0)
 
 
 #reload and wait page on left or right of screen (0, 1), return True or False if successful
 def ReloadAndWait(window):
     print('reloading')
-    #pyautogui.click(loc_reload[window])
+    pyautogui.click(loc_reload[window])
     time.sleep(0.5)
     pyautogui.moveTo(loc_mousehide)
 
@@ -74,6 +74,16 @@ def ReloadAndWait(window):
 
     return i > 10
 
+
+def Wait(seconds):
+    sleep_time = random.randrange(10, 50)
+    print('waiting', str(seconds), 'seconds until next refresh')
+
+    target = time.time() + seconds
+    while time.time() < target:
+        if keyboard.is_pressed('p'):
+            Pause()
+        #time.sleep(0.5)
 
 #keep track of each rows id and premium status. each iteration retrieve new trip info then for each premium trip found check if it was present in last iteration
 #if not then alert user
@@ -87,8 +97,8 @@ def MonitorWindow():
     num_refreshes = 0
 
     for i in range(0, 13):
-        img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1][i], bb_prem_name[2], bb_prem_name[3][i]))
-        img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1][i], bb_prem_icon[2], bb_prem_icon[3][i]))
+        img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
+        img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
 
     while True:
         play_alert = False
@@ -96,8 +106,8 @@ def MonitorWindow():
         img_names_last = img_names.copy()
         img_icons_last = img_icons.copy()
         for i in range(0, 13):
-            img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1][i], bb_prem_name[2], bb_prem_name[3][i]))
-            img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1][i], bb_prem_icon[2], bb_prem_icon[3][i]))
+            img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
+            img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
 
             #just look for empty image. ned to make custom index of function to check for image equality.
             # row contains premium trip where it did not before
@@ -140,6 +150,10 @@ def MonitorWindow():
 #==== main ====
 state = "MONITORING"
 
+
+while True:
+    Wait(10)
+
 print("waiting 5 sec")
 time.sleep(5)
 print("starting")
@@ -148,14 +162,14 @@ if night_cont:
     sbc.set_brightness(0)
 
 for i in range(0, 13):
-    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1][i], bb_prem_name[2], bb_prem_name[3][i])).save('name_{}.png'.format(i))
-    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1][i], bb_prem_icon[2], bb_prem_icon[3][i])).save('icon_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('name_{}.png'.format(i))
+    ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('icon_{}.png'.format(i))
 
 pyautogui.click(loc_mousehide)
 
 
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0]) # might need to account for window being focused or not
-img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0]+100, bb_prem_icon[1][0], bb_prem_icon[2]+100, bb_prem_icon[3][0]))
+img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0]+100, bb_prem_icon[1], bb_prem_icon[2]+100, bb_prem_icon[3]))
 img_blank.save('blank.png')
 MonitorWindow()
 
