@@ -101,8 +101,8 @@ def MonitorWindow():
     num_refreshes = 0
 
     for i in range(0, prem_num_rows):
-        img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
-        img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
+        img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i + vertical_offset, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i + vertical_offset))
+        img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i + vertical_offset, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i + vertical_offset))
 
     while True:
         play_alert = False
@@ -110,8 +110,8 @@ def MonitorWindow():
         img_names_last = img_names.copy()
         img_icons_last = img_icons.copy()
         for i in range(0, prem_num_rows):
-            img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
-            img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
+            img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i + vertical_offset, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i + vertical_offset))
+            img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i + vertical_offset, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i + vertical_offset))
 
             #just look for empty image. ned to make custom index of function to check for image equality.
             # row contains premium trip where it did not before
