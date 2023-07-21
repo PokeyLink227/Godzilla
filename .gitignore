@@ -1,4 +1,11 @@
 alert_sound.wav
-debug
 window_test.py
+
+#folders
+debug
 test_pages
+
+#compilation data
+main.spec
+dist
+build
