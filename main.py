@@ -140,7 +140,7 @@ bb_rsa = None
 #load config file
 with open('config.json', 'r') as file:
     config = json.load(file)
-system_mode = config['mode']
+system_mode = 'dev' if pyautogui.size().width == 1920 else 'release'
 print('[System] Loading in {} mode'.format(system_mode))
 
 bb_reload = config[system_mode]['bb_reload']
