@@ -140,14 +140,15 @@ def update():
         r = requests.get(response.json()['assets'][0]['browser_download_url'])
         f = open('update.zip','wb')
         f.write(r.content)
+        f.close()
 
         with ZipFile("update.zip") as zpf:
             zpf.extractall()
 
         shutil.move('main', '../temp')
-        shutil.rmtree('../main')
-        os.rename('../temp', '../main')
-        print('[System] Update installed')
+        f = open('../upd.bat', 'w')
+        f.write('@echo off\npause 1\nrd /s /q main\nrename temp main\ndel upd.bat')
+        os.startfile('../upd.bat')
         exit()
     print('[System] Program up to date')
 
