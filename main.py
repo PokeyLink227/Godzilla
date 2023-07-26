@@ -124,7 +124,31 @@ def MonitorWindow():
 
 
 
+def update():
+    print('[System] Checking for updates')
+    VERSION = 'v1.0'
+
+    url = "https://api.github.com/repos/pokeylink227/godzilla/releases/latest"
+    response = requests.get(url)
+
+    if response.json()['tag_name'] > VERSION:
+        print('[System] Update found')
+        r = requests.get(response.json()['assets'][0]['browser_download_url'])
+        f = open('update.zip','wb')
+        f.write(r.content)
+
+        with ZipFile("update.zip") as zpf:
+            zpf.extractall()
+
+        shutil.move('main', '../temp')
+        shutil.rmtree('../main')
+        os.rename('../temp', '../main')
+        print('[System] Update installed')
+        exit()
+    print('[System] Program up to date')
+
 #==== main ====
+update()
 print('[System] Waiting 5 seconds')
 time.sleep(5)
 print('[System] Performing setup')
