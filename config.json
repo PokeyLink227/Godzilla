@@ -14,9 +14,9 @@
         "bb_reload": [[90, 55, 105, 75], [0]],
         "loc_reload": [[100, 65], [780, 65]],
         "bb_vertprobe": [380, 350, 381, 450],
-        "vertprobe_goal": 49,
-        "bb_prem_name": [99, 482, 181, 488],
-        "bb_prem_icon": [530, 482, 540, 488],
+        "vertprobe_goal": 55,
+        "bb_prem_name": [99, 476, 170, 483],
+        "bb_prem_icon": [530, 476, 540, 483],
         "prem_row_height": 25,
         "prem_num_rows": 9
     }
