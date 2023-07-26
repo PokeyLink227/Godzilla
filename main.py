@@ -2,6 +2,10 @@ import json
 import time
 import random
 import winsound
+import requests
+import shutil
+import os
+from zipfile import ZipFile
 
 from PIL import ImageGrab
 from PIL import ImageChops
