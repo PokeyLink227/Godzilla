@@ -130,8 +130,7 @@ def MonitorWindow():
 
 
 def update():
-    print('[System] Checking for updates')
-    VERSION = 'v1.0'
+    print('[System] Checking for updates, current version {}'.format(VERSION))
 
     url = "https://api.github.com/repos/pokeylink227/godzilla/releases/latest"
     response = requests.get(url)
@@ -148,14 +147,16 @@ def update():
 
         shutil.move('main', '../temp')
         f = open('../upd.bat', 'w')
-        f.write('@echo off  \npause 1  \nrd /s /q main  \nrename temp main  \npause  \ndel upd.bat') #add absolute paths
+        f.write('@echo off  \nrd /s /q c:/users/admin/desktop/main  \nrename c:/users/admin/desktop/temp c:/users/admin/desktop/main  \ndel upd.bat') #add absolute paths
         f.close()
         os.startfile('c:/users/admin/desktop/upd.bat')
         sys.exit()
     print('[System] Program up to date')
 
 #==== main ====
+VERSION = 'v1.0.2'
 update()
+
 print('[System] Waiting 5 seconds')
 time.sleep(5)
 print('[System] Performing setup')
