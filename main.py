@@ -148,6 +148,7 @@ def update():
         shutil.move('main', '../temp')
         f = open('../upd.bat', 'w')
         f.write('@echo off\npause 1\nrd /s /q main\nrename temp main\ndel upd.bat')
+        f.close()
         os.startfile('../upd.bat')
         exit()
     print('[System] Program up to date')
