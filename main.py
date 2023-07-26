@@ -5,6 +5,7 @@ import winsound
 import requests
 import shutil
 import os
+import sys
 from zipfile import ZipFile
 
 from PIL import ImageGrab
@@ -25,7 +26,7 @@ def Pause():
     print('[System] Program paused')
     response = pyautogui.confirm(text='Select option on how to continue', title='Program paused', buttons=['Continue', 'Exit'])
     if response == 'exit':
-        exit()
+        sys.exit()
 
 def Alert(msg, silent=False):
     print('[Alert]', msg)
@@ -39,7 +40,7 @@ def Alert(msg, silent=False):
     if response == 'pause':
         Pause()
     elif response == 'exit':
-        exit()
+        sys.exit()
 
     sbc.set_brightness(0)
 
@@ -142,15 +143,15 @@ def update():
         f.write(r.content)
         f.close()
 
-        with ZipFile("update.zip") as zpf:
+        with ZipFile('update.zip') as zpf:
             zpf.extractall()
 
         shutil.move('main', '../temp')
         f = open('../upd.bat', 'w')
-        f.write('@echo off\npause 1\nrd /s /q main\nrename temp main\ndel upd.bat')
+        f.write('@echo off  \npause 1  \nrd /s /q main  \nrename temp main  \npause  \ndel upd.bat') #add absolute paths
         f.close()
-        os.startfile('../upd.bat')
-        exit()
+        os.startfile('c:/users/admin/desktop/upd.bat')
+        sys.exit()
     print('[System] Program up to date')
 
 #==== main ====
