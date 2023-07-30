@@ -147,9 +147,9 @@ def update():
 
         shutil.move('main', '../temp')
         f = open('../upd.bat', 'w')
-        f.write('@echo off  \nrd /s /q c:/users/admin/desktop/main  \nrename c:/users/admin/desktop/temp c:/users/admin/desktop/main  \ndel upd.bat') #add absolute paths
+        f.write('@echo off  \nrd /s /q {}/../main  \nrename {}/../temp {}/../main  \ndel upd.bat'.format(dir, dir, dir)) #add absolute paths
         f.close()
-        os.startfile('c:/users/admin/desktop/upd.bat')
+        os.startfile('{}/../upd.bat')
         sys.exit()
     print('[System] Program up to date')
 
@@ -162,6 +162,7 @@ time.sleep(5)
 print('[System] Performing setup')
 
 #set up variables
+dir = os.getcwd()
 night_cont = True
 img_reload_initial = [None, None]
 vertical_offset = 0
