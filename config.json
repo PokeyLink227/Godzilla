@@ -16,7 +16,7 @@
         "bb_vertprobe": [380, 350, 381, 450],
         "vertprobe_goal": 55,
         "bb_prem_name": [99, 476, 170, 483],
-        "bb_prem_icon": [470, 476, 480, 483],
+        "bb_prem_icon": [470, 476, 500, 483],
         "prem_row_height": 25,
         "prem_num_rows": 9
     }
