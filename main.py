@@ -157,8 +157,8 @@ def update():
 VERSION = 'v1.0.2'
 update()
 
-print('[System] Waiting 5 seconds')
-time.sleep(5)
+print('[System] Waiting 10 seconds')
+time.sleep(10)
 print('[System] Performing setup')
 
 #set up variables
@@ -187,6 +187,7 @@ prem_num_rows = config[system_mode]['prem_num_rows']
 
 
 
+pyautogui.click(loc_mousehide)
 
 # find vertical offset
 img_vertprobe = ImageGrab.grab(bbox=bb_vertprobe)
@@ -208,7 +209,6 @@ for i in range(0, prem_num_rows):
     ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('debug/name_{}.png'.format(i))
     ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('debug/icon_{}.png'.format(i))
 
-pyautogui.click(loc_mousehide)
 
 
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0]) # might need to account for window being focused or not
