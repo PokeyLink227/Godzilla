@@ -1,23 +1,35 @@
 {
-    "mode": "dev",
+    "mode": "default",
     "dev": {
         "bb_reload": [[80, 54, 94, 68], [1040, 54, 1054, 68]],
         "loc_reload": [[87, 61], [1047, 61]],
-        "bb_vertprobe": [380, 350, 381, 450],
-        "vertprobe_goal": 49,
+        "bb_prem_vertprobe": [380, 350, 381, 450],
+        "prem_vertprobe_goal": 49,
         "bb_prem_name": [97, 470, 171, 477],
         "bb_prem_icon": [482, 470, 489, 477],
         "prem_row_height": 25,
-        "prem_num_rows": 13
+        "prem_num_rows": 13,
+        "monitor_rsa": true,
+        "bb_rsa_vertprobe": [380, 350, 381, 450],
+        "rsa_vertprobe_goal": 49,
+        "bb_rsa": [0, 0, 1, 1],
+        "rsa_row_height": 25,
+        "rsa_num_rows": 10
     },
     "release": {
-        "bb_reload": [[90, 55, 105, 75], [0]],
-        "loc_reload": [[100, 65], [780, 65]],
-        "bb_vertprobe": [380, 350, 381, 450],
-        "vertprobe_goal": 55,
-        "bb_prem_name": [99, 476, 170, 483],
+        "bb_reload": [[80, 57, 94, 71], [763, 57, 777, 71]],
+        "loc_reload": [[87, 64], [770, 64]],
+        "bb_prem_vertprobe": [380, 350, 381, 450],
+        "prem_vertprobe_goal": 55,
+        "bb_prem_name": [97, 476, 170, 483],
         "bb_prem_icon": [480, 476, 490, 483],
         "prem_row_height": 25,
-        "prem_num_rows": 9
+        "prem_num_rows": 9,
+        "monitor_rsa": true,
+        "bb_rsa_vertprobe": [1050, 350, 1051, 450],
+        "rsa_vertprobe_goal": 28,
+        "bb_rsa": [782, 449, 853, 456],
+        "rsa_row_height": 25,
+        "rsa_num_rows": 10
     }
 }

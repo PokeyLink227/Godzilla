@@ -50,7 +50,7 @@ def ReloadAndWait(window):
     print('[System] Reloading {} window'.format('Premium' if window == 0 else 'Rsa'))
     pyautogui.click(loc_reload[window])
     time.sleep(0.5)
-    pyautogui.moveTo(loc_mousehide)
+    pyautogui.moveTo(loc_mousehide[window])
 
     i = 6000
 
@@ -80,17 +80,26 @@ def MonitorWindow():
     img_names_last = [0] * prem_num_rows
     img_icons_last = [0] * prem_num_rows
 
+    img_rsa = [0] * rsa_num_rows
+    img_rsa_last = [0] * rsa_num_rows
+
     num_refreshes = 0
 
+    pyautogui.click(loc_mousehide[0])
     for i in range(0, prem_num_rows):
         img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
         img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
+
+    pyautogui.click(loc_mousehide[1])
+    for i in range(0, rsa_num_rows):
+        img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
 
     while True:
         play_alert = False
         linesfound = []
         img_names_last = img_names.copy()
         img_icons_last = img_icons.copy()
+        pyautogui.click(loc_mousehide[0])
         for i in range(0, prem_num_rows):
             img_names[i] = ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i))
             img_icons[i] = ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i))
@@ -123,9 +132,20 @@ def MonitorWindow():
         num_refreshes = num_refreshes + 1
 
         if num_refreshes % 5 == 0:
+            img_rsa_last = img_rsa.copy()
+            pyautogui.click(loc_mousehide[1])
+            for i in range(0, rsa_num_rows):
+                img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
+                img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
+                if img_old_index == -1:
+                    play_alert = True
+                    linesfound.append(i + 1)
+
+            if play_alert:
+                Alert('Rsa found on line(s) {}'.format(str(linesfound)))
+
             Wait(random.randrange(10, 50))
-            pyautogui.click(loc_reload[1])
-            pyautogui.click(loc_mousehide)
+            ReloadAndWait(1)
 
 
 
@@ -154,7 +174,7 @@ def update():
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.0.2'
+VERSION = 'v1.0.3'
 update()
 
 print('[System] Waiting 10 seconds')
@@ -165,8 +185,9 @@ print('[System] Performing setup')
 dir = os.getcwd()
 night_cont = True
 img_reload_initial = [None, None]
-vertical_offset = 0
-loc_mousehide = [50, 295]
+prem_vertical_offset = 0
+rsa_vertical_offset = 0
+loc_mousehide = [[50, 295], [737, 300]]
 img_blank = None
 bb_rsa = None
 
@@ -178,28 +199,46 @@ print('[System] Loading in {} mode'.format(system_mode))
 
 bb_reload = config[system_mode]['bb_reload']
 loc_reload = config[system_mode]['loc_reload']
-bb_vertprobe = config[system_mode]['bb_vertprobe']
-vertprobe_goal = config[system_mode]['vertprobe_goal']
+bb_prem_vertprobe = config[system_mode]['bb_prem_vertprobe']
+prem_vertprobe_goal = config[system_mode]['prem_vertprobe_goal']
 bb_prem_name = config[system_mode]['bb_prem_name']
 bb_prem_icon = config[system_mode]['bb_prem_icon']
 prem_row_height = config[system_mode]['prem_row_height']
 prem_num_rows = config[system_mode]['prem_num_rows']
+bb_rsa_vertprobe = config[system_mode]['bb_rsa_vertprobe']
+rsa_vertprobe_goal = config[system_mode]['rsa_vertprobe_goal']
+bb_rsa = config[system_mode]['bb_rsa']
+rsa_row_height = config[system_mode]['rsa_row_height']
+rsa_num_rows = config[system_mode]['rsa_num_rows']
+option_monitor_rsa = config[system_mode]['monitor_rsa']
 
 
 
-pyautogui.click(loc_mousehide)
+pyautogui.click(loc_mousehide[0])
 
 # find vertical offset
-img_vertprobe = ImageGrab.grab(bbox=bb_vertprobe)
+img_vertprobe = ImageGrab.grab(bbox=bb_prem_vertprobe)
 for y in range(0, 100):
     if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
-        if y != vertprobe_goal:
-            vertical_offset = y - vertprobe_goal
-            bb_prem_name[1] += vertical_offset
-            bb_prem_name[3] += vertical_offset
-            bb_prem_icon[1] += vertical_offset
-            bb_prem_icon[3] += vertical_offset
+        if y != prem_vertprobe_goal:
+            prem_vertical_offset = y - prem_vertprobe_goal
+            bb_prem_name[1] += prem_vertical_offset
+            bb_prem_name[3] += prem_vertical_offset
+            bb_prem_icon[1] += prem_vertical_offset
+            bb_prem_icon[3] += prem_vertical_offset
         break
+
+pyautogui.click(loc_mousehide[1])
+img_vertprobe = ImageGrab.grab(bbox=bb_rsa_vertprobe)
+for y in range(0, 100):
+    if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
+        if y != rsa_vertprobe_goal:
+            rsa_vertical_offset = y - rsa_vertprobe_goal
+            bb_rsa[1] += rsa_vertical_offset
+            bb_rsa[3] += rsa_vertical_offset
+        break
+
+
 
 
 if night_cont:
@@ -208,6 +247,8 @@ if night_cont:
 for i in range(0, prem_num_rows):
     ImageGrab.grab(bbox=(bb_prem_name[0], bb_prem_name[1] + prem_row_height * i, bb_prem_name[2], bb_prem_name[3] + prem_row_height * i)).save('debug/name_{}.png'.format(i))
     ImageGrab.grab(bbox=(bb_prem_icon[0], bb_prem_icon[1] + prem_row_height * i, bb_prem_icon[2], bb_prem_icon[3] + prem_row_height * i)).save('debug/icon_{}.png'.format(i))
+for i in range(0, rsa_num_rows):
+    ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i)).save('debug/rsa_{}.png'.format(i))
 
 
 
