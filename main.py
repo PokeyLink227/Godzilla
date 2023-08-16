@@ -150,7 +150,12 @@ def MonitorWindow():
 
 
 def update():
-    print('[System] Checking for updates, current version {}'.format(VERSION))
+    print(f'[System] Checking for updates, current version {VERSION}')
+
+    dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+    if os.path.exists(f'{dir}\\temp'):
+        shutil.rmtree(f'{dir}\\temp')
 
     url = "https://api.github.com/repos/pokeylink227/godzilla/releases/latest"
     response = requests.get(url)
@@ -165,16 +170,18 @@ def update():
         with ZipFile('update.zip') as zpf:
             zpf.extractall()
 
-        shutil.move('main', '../temp')
-        f = open('../upd.bat', 'w')
-        f.write('@echo off  \nrd /s /q {}/../main  \nrename {}/../temp {}/../main  \ndel upd.bat'.format(dir, dir, dir)) #add absolute paths
+        shutil.move(f'{dir}\\main\\main', f'{dir}\\temp')
+
+        f = open(f'{dir}/upd.bat', 'w')
+        f.write(f'@echo off  \ncd {dir}\nrmdir /s /q {dir}\\main  \ntimeout 2 >nul\nrename {dir}\\temp main  \ntimeout 2 >nul\ndel {dir}\\upd.bat') #add absolute paths
         f.close()
-        os.startfile('{}/../upd.bat')
+        os.startfile(f'{dir}/upd.bat')
+
         sys.exit()
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.0.3'
+VERSION = 'v1.0.4'
 update()
 
 print('[System] Waiting 10 seconds')
@@ -182,7 +189,6 @@ time.sleep(10)
 print('[System] Performing setup')
 
 #set up variables
-dir = os.getcwd()
 night_cont = True
 img_reload_initial = [None, None]
 prem_vertical_offset = 0
