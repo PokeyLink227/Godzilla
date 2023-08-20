@@ -131,7 +131,7 @@ def MonitorWindow():
 
         num_refreshes = num_refreshes + 1
 
-        if num_refreshes % 5 == 0:
+        if num_refreshes % 5 == 0 and option_monitor_rsa:
             img_rsa_last = img_rsa.copy()
             pyautogui.click(loc_mousehide[1])
             for i in range(0, rsa_num_rows):
@@ -146,6 +146,7 @@ def MonitorWindow():
 
             Wait(random.randrange(10, 50))
             ReloadAndWait(1)
+            num_refreshes = num_refreshes + 1
 
 
 
@@ -181,7 +182,7 @@ def update():
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.0.4'
+VERSION = 'v1.0.5'
 update()
 
 print('[System] Waiting 10 seconds')
