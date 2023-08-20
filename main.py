@@ -222,9 +222,8 @@ option_monitor_rsa = config[system_mode]['monitor_rsa']
 
 
 
-pyautogui.click(loc_mousehide[0])
-
 # find vertical offset
+pyautogui.click(loc_mousehide[0])
 img_vertprobe = ImageGrab.grab(bbox=bb_prem_vertprobe)
 for y in range(0, 100):
     if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
