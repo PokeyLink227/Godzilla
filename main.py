@@ -2,12 +2,12 @@ import json
 import time
 import random
 import winsound
-import requests
 import shutil
 import os
 import sys
 from zipfile import ZipFile
 
+import requests
 from PIL import ImageGrab
 from PIL import ImageChops
 import pyautogui
@@ -182,8 +182,9 @@ def update():
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.0.5'
+VERSION = 'v1.0.6'
 update()
+
 
 print('[System] Waiting 10 seconds')
 time.sleep(10)
@@ -258,8 +259,13 @@ for i in range(0, rsa_num_rows):
     ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i)).save('debug/rsa_{}.png'.format(i))
 
 
+pyautogui.click(loc_mousehide[0])
+img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0])
+time.sleep(0.2)
+pyautogui.click(loc_mousehide[1])
+img_reload_initial[1] = ImageGrab.grab(bbox=bb_reload[1])
+time.sleep(0.2)
 
-img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0]) # might need to account for window being focused or not
 img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0] + 50, bb_prem_icon[1], bb_prem_icon[2] + 50, bb_prem_icon[3]))
 img_blank.save('debug/blank.png')
 
