@@ -137,7 +137,7 @@ def MonitorWindow():
             for i in range(0, rsa_num_rows):
                 img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
                 img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
-                if img_old_index == -1:
+                if img_old_index == -1 && ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
                     play_alert = True
                     linesfound.append(i + 1)
 
@@ -197,6 +197,7 @@ prem_vertical_offset = 0
 rsa_vertical_offset = 0
 loc_mousehide = [[50, 295], [737, 300]]
 img_blank = None
+rsa_blank = None
 bb_rsa = None
 
 #load config file
@@ -267,6 +268,8 @@ time.sleep(0.2)
 
 img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0] + 50, bb_prem_icon[1], bb_prem_icon[2] + 50, bb_prem_icon[3]))
 img_blank.save('debug/blank.png')
+img_blank = ImageGrab.grab(bbox=(bb_rsa_icon[0] + 400, bb_rsa_icon[1], bb_rsa_icon[2] + 400, bb_rsa_icon[3]))
+rsa_blank.save('debug/blank.png')
 
 print('[System] Setup complete')
 MonitorWindow()
