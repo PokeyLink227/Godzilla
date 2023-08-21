@@ -131,7 +131,7 @@ def MonitorWindow():
 
         num_refreshes = num_refreshes + 1
 
-        if num_refreshes % 5 == 0 and option_monitor_rsa:
+        if num_refreshes % rsa_interval == 0 and option_monitor_rsa:
             img_rsa_last = img_rsa.copy()
             pyautogui.click(loc_mousehide[1])
             for i in range(0, rsa_num_rows):
@@ -220,6 +220,8 @@ bb_rsa = config[system_mode]['bb_rsa']
 rsa_row_height = config[system_mode]['rsa_row_height']
 rsa_num_rows = config[system_mode]['rsa_num_rows']
 option_monitor_rsa = config[system_mode]['monitor_rsa']
+
+rsa_interval = config['rsa_interval']
 
 
 

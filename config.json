@@ -1,5 +1,6 @@
 {
     "mode": "default",
+    "rsa_interval": 3,
     "dev": {
         "bb_reload": [[80, 54, 94, 68], [1040, 54, 1054, 68]],
         "loc_reload": [[87, 61], [1047, 61]],
