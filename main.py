@@ -95,6 +95,7 @@ def MonitorWindow():
         img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
 
     while True:
+        realign()
         play_alert = False
         linesfound = []
         img_names_last = img_names.copy()
@@ -133,6 +134,7 @@ def MonitorWindow():
         num_refreshes = num_refreshes + 1
 
         if num_refreshes % rsa_interval == 0 and option_monitor_rsa:
+            realign()
             img_rsa_last = img_rsa.copy()
             pyautogui.click(loc_mousehide[1])
             for i in range(0, rsa_num_rows):
@@ -150,6 +152,37 @@ def MonitorWindow():
             ReloadAndWait(1)
             num_refreshes = num_refreshes + 1
 
+def realign():
+    # find vertical offset
+    pyautogui.click(loc_mousehide[0])
+    img_vertprobe = ImageGrab.grab(bbox=bb_prem_vertprobe)
+    for y in range(0, 100):
+        if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
+            if y != prem_vertprobe_goal:
+                prem_vertical_offset = y - prem_vertprobe_goal
+                bb_prem_name[1] += prem_vertical_offset
+                bb_prem_name[3] += prem_vertical_offset
+                bb_prem_icon[1] += prem_vertical_offset
+                bb_prem_icon[3] += prem_vertical_offset
+            break
+
+
+    img_horizprobe = ImageGrab.grab(bbox=(0, bb_prem_icon[1], 600, bb_prem_icon[1] + 1))
+    for x in range(560, 450, -1):
+        if img_horizprobe.getpixel((x, 0)) == (128, 128, 128):
+            bb_prem_icon[0] = x - 20
+            bb_prem_icon[2] = x - 10
+            break
+
+    pyautogui.click(loc_mousehide[1])
+    img_vertprobe = ImageGrab.grab(bbox=bb_rsa_vertprobe)
+    for y in range(0, 100):
+        if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
+            if y != rsa_vertprobe_goal:
+                rsa_vertical_offset = y - rsa_vertprobe_goal
+                bb_rsa[1] += rsa_vertical_offset
+                bb_rsa[3] += rsa_vertical_offset
+            break
 
 
 def update():
@@ -226,37 +259,7 @@ rsa_interval = config['rsa_interval']
 
 
 
-# find vertical offset
-pyautogui.click(loc_mousehide[0])
-img_vertprobe = ImageGrab.grab(bbox=bb_prem_vertprobe)
-for y in range(0, 100):
-    if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
-        if y != prem_vertprobe_goal:
-            prem_vertical_offset = y - prem_vertprobe_goal
-            bb_prem_name[1] += prem_vertical_offset
-            bb_prem_name[3] += prem_vertical_offset
-            bb_prem_icon[1] += prem_vertical_offset
-            bb_prem_icon[3] += prem_vertical_offset
-        break
-
-
-img_horizprobe = ImageGrab.grab(bbox=(0, bb_prem_icon[1], 600, bb_prem_icon[1] + 1))
-for x in range(560, 450, -1):
-    if img_horizprobe.getpixel((x, 0)) == (128, 128, 128):
-        bb_prem_icon[0] = x - 20
-        bb_prem_icon[2] = x - 10
-        break
-
-pyautogui.click(loc_mousehide[1])
-img_vertprobe = ImageGrab.grab(bbox=bb_rsa_vertprobe)
-for y in range(0, 100):
-    if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
-        if y != rsa_vertprobe_goal:
-            rsa_vertical_offset = y - rsa_vertprobe_goal
-            bb_rsa[1] += rsa_vertical_offset
-            bb_rsa[3] += rsa_vertical_offset
-        break
-
+realign()
 
 
 
