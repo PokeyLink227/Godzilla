@@ -126,6 +126,7 @@ def MonitorWindow():
         if play_alert:
             Alert('Premium trip found on line(s) {}'.format(str(linesfound)))
 
+        print(f'[System] Refresh count: {num_refreshes}')
         Wait(random.randrange(10, 50))
         ReloadAndWait(0)
 
@@ -137,13 +138,14 @@ def MonitorWindow():
             for i in range(0, rsa_num_rows):
                 img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
                 img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
-                if img_old_index == -1 && ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
+                if img_old_index == -1 and ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
                     play_alert = True
                     linesfound.append(i + 1)
 
             if play_alert:
                 Alert('Rsa found on line(s) {}'.format(str(linesfound)))
 
+            print(f'[System] Refresh count: {num_refreshes}')
             Wait(random.randrange(10, 50))
             ReloadAndWait(1)
             num_refreshes = num_refreshes + 1
@@ -182,7 +184,7 @@ def update():
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.0.6'
+VERSION = 'v1.0.7'
 update()
 
 
@@ -198,7 +200,6 @@ rsa_vertical_offset = 0
 loc_mousehide = [[50, 295], [737, 300]]
 img_blank = None
 rsa_blank = None
-bb_rsa = None
 
 #load config file
 with open('config.json', 'r') as file:
@@ -238,6 +239,14 @@ for y in range(0, 100):
             bb_prem_icon[3] += prem_vertical_offset
         break
 
+
+img_horizprobe = ImageGrab.grab(bbox=(0, bb_prem_icon[1], 600, bb_prem_icon[1] + 1))
+for x in range(560, 450, -1):
+    if img_horizprobe.getpixel((x, 0)) == (128, 128, 128):
+        bb_prem_icon[0] = x - 20
+        bb_prem_icon[2] = x - 10
+        break
+
 pyautogui.click(loc_mousehide[1])
 img_vertprobe = ImageGrab.grab(bbox=bb_rsa_vertprobe)
 for y in range(0, 100):
@@ -270,8 +279,8 @@ time.sleep(0.2)
 
 img_blank = ImageGrab.grab(bbox=(bb_prem_icon[0] + 50, bb_prem_icon[1], bb_prem_icon[2] + 50, bb_prem_icon[3]))
 img_blank.save('debug/blank.png')
-img_blank = ImageGrab.grab(bbox=(bb_rsa_icon[0] + 400, bb_rsa_icon[1], bb_rsa_icon[2] + 400, bb_rsa_icon[3]))
-rsa_blank.save('debug/blank.png')
+rsa_blank = ImageGrab.grab(bbox=(bb_rsa[0] + 400, bb_rsa[1], bb_rsa[2] + 400, bb_rsa[3]))
+rsa_blank.save('debug/rsa_blank.png')
 
 print('[System] Setup complete')
 MonitorWindow()
