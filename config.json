@@ -21,7 +21,7 @@
         "bb_reload": [[80, 57, 94, 71], [763, 57, 777, 71]],
         "loc_reload": [[87, 64], [770, 64]],
         "bb_prem_vertprobe": [380, 350, 381, 450],
-        "prem_vertprobe_goal": 55,
+        "prem_vertprobe_goal": 70,
         "bb_prem_name": [97, 476, 170, 483],
         "bb_prem_icon": [480, 476, 490, 483],
         "prem_row_height": 25,
