@@ -192,7 +192,7 @@ def update():
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.2.0'
+VERSION = 'v1.1.1'
 update()
 
 
