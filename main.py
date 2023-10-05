@@ -133,20 +133,20 @@ def MonitorWindow():
 
         num_refreshes = num_refreshes + 1
 
+        realign()
+        img_rsa_last = img_rsa.copy()
+        pyautogui.click(loc_mousehide[1])
+        for i in range(0, rsa_num_rows):
+            img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
+            img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
+            if img_old_index == -1 and ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
+                play_alert = True
+                linesfound.append(i + 1)
+
+        if play_alert:
+            Alert('Rsa found on line(s) {}'.format(str(linesfound)))
+
         if num_refreshes % rsa_interval == 0 and option_monitor_rsa:
-            realign()
-            img_rsa_last = img_rsa.copy()
-            pyautogui.click(loc_mousehide[1])
-            for i in range(0, rsa_num_rows):
-                img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
-                img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
-                if img_old_index == -1 and ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
-                    play_alert = True
-                    linesfound.append(i + 1)
-
-            if play_alert:
-                Alert('Rsa found on line(s) {}'.format(str(linesfound)))
-
             print(f'[System] Refresh count: {num_refreshes}')
             Wait(random.randrange(10, 50))
             ReloadAndWait(1)
