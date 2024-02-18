@@ -204,7 +204,7 @@ def update():
 
 #==== main ====
 VERSION = 'v1.1.3'
-#update()
+update()
 
 
 print('[System] Waiting 10 seconds')
