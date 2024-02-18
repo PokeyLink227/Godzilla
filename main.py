@@ -25,24 +25,28 @@ def IndexOfImage(imageArray, img):
 def Pause():
     print('[System] Program paused')
     response = pyautogui.confirm(text='Select option on how to continue', title='Program paused', buttons=['Continue', 'Exit'])
-    if response == 'exit':
+    if response == 'Exit':
         sys.exit()
+        os._exit()
+        quit()
+        exit()
 
 def Alert(msg, silent=False):
     print('[Alert]', msg)
-    sbc.set_brightness(30)
+    if night_cont:
+        sbc.set_brightness(30)
     winsound.PlaySound('alert_sound.wav', winsound.SND_LOOP|winsound.SND_ASYNC)
 
     response = pyautogui.confirm(text=msg, title='Select option on how to continue', buttons=['Continue', 'Pause', 'Exit'])
 
     winsound.PlaySound(None, 0)
 
-    if response == 'pause':
+    if response == 'Pause':
         Pause()
-    elif response == 'exit':
-        sys.exit()
-
-    sbc.set_brightness(0)
+    elif response == 'Exit':
+        os._exit()
+    if night_cont:
+        sbc.set_brightness(0)
 
 
 #reload and wait page on left or right of screen (0, 1), return True or False if successful
@@ -107,15 +111,17 @@ def MonitorWindow():
 
             #just look for empty image. ned to make custom index of function to check for image equality.
             # row contains premium trip where it did not before
-            if ImageChops.difference(img_blank, img_icons[i]).getbbox():
-                print('[Debug] Trip on row', str(i), 'is premium, previously found on row ', end='')
-                img_old_index = IndexOfImage(img_names_last, img_names[i])
-                print(str(img_old_index))
+            if ImageChops.difference(img_blank, img_icons[i]).getbbox() or not filter_prem:
+                if filter_prem:
+                    print('[Debug] Trip on row', str(i), 'is premium, previously found on row ', end='')
+                    img_old_index = IndexOfImage(img_names_last, img_names[i])
+                    print(str(img_old_index))
                 # trip existed before but was not premium
                 if img_old_index > -1:
                     if not ImageChops.difference(img_icons_last[img_old_index], img_blank).getbbox():
                         play_alert = True
-                        linesfound.append(i + 1)
+                        if filter_prem:
+                            linesfound.append(i + 1)
                         #Alert("Trip went Premium")
                     #else:
                         #Alert('Trip stayed premium')
@@ -126,33 +132,38 @@ def MonitorWindow():
 
         if play_alert:
             Alert('Premium trip found on line(s) {}'.format(str(linesfound)))
+            play_alert = False
 
         print(f'[System] Refresh count: {num_refreshes}')
-        Wait(random.randrange(10, 50))
-        ReloadAndWait(0)
+        Wait(random.randrange(2, 6))
+        if num_refreshes % 15 == 14:
+            ReloadAndWait(0)
 
         num_refreshes = num_refreshes + 1
 
-        realign()
-        img_rsa_last = img_rsa.copy()
-        pyautogui.click(loc_mousehide[1])
-        for i in range(0, rsa_num_rows):
-            img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
-            img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
-            if img_old_index == -1 and ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
-                play_alert = True
-                linesfound.append(i + 1)
+        if option_monitor_rsa:
+            realign()
+            img_rsa_last = img_rsa.copy()
+            pyautogui.click(loc_mousehide[1])
+            for i in range(0, rsa_num_rows):
+                img_rsa[i] = ImageGrab.grab(bbox=(bb_rsa[0], bb_rsa[1] + rsa_row_height * i, bb_rsa[2], bb_rsa[3] + rsa_row_height * i))
+                img_old_index = IndexOfImage(img_rsa_last, img_rsa[i])
+                if img_old_index == -1 and ImageChops.difference(rsa_blank, img_rsa[i]).getbbox():
+                    play_alert = True
+                    linesfound.append(i + 1)
 
-        if play_alert:
-            Alert('Rsa found on line(s) {}'.format(str(linesfound)))
+            if play_alert:
+                Alert('Rsa found on line(s) {}'.format(str(linesfound)))
+                play_alert = False
 
-        if num_refreshes % rsa_interval == 0 and option_monitor_rsa:
-            print(f'[System] Refresh count: {num_refreshes}')
-            Wait(random.randrange(10, 50))
-            ReloadAndWait(1)
-            num_refreshes = num_refreshes + 1
+            if num_refreshes % rsa_interval == 0 and option_monitor_rsa:
+                print(f'[System] Refresh count: {num_refreshes}')
+                Wait(random.randrange(10, 50))
+                ReloadAndWait(1)
+                num_refreshes = num_refreshes + 1
 
 def realign():
+    return
     img_horizprobe = ImageGrab.grab(bbox=(0, bb_prem_icon[1], 600, bb_prem_icon[1] + 1))
     for x in range(560, 450, -1):
         if img_horizprobe.getpixel((x, 0)) == (128, 128, 128):
@@ -192,8 +203,8 @@ def update():
     print('[System] Program up to date')
 
 #==== main ====
-VERSION = 'v1.1.2'
-update()
+VERSION = 'v1.1.3'
+#update()
 
 
 print('[System] Waiting 10 seconds')
@@ -201,13 +212,14 @@ time.sleep(10)
 print('[System] Performing setup')
 
 #set up variables
-night_cont = True
+night_cont = False
 img_reload_initial = [None, None]
 prem_vertical_offset = 0
 rsa_vertical_offset = 0
 loc_mousehide = [[50, 295], [737, 300]]
 img_blank = None
 rsa_blank = None
+filter_prem = False
 
 #load config file
 with open('config.json', 'r') as file:
@@ -238,10 +250,11 @@ pyautogui.click(loc_mousehide[0])
 img_vertprobe = ImageGrab.grab(bbox=bb_prem_vertprobe)
 for y in range(0, 100):
     if img_vertprobe.getpixel((0, y)) == (128, 128, 128): # color of top of table
-        bb_prem_name[1] = 350 + y + 71
-        bb_prem_name[3] = 350 + y + 71 + 7
-        bb_prem_icon[1] = 350 + y + 71
-        bb_prem_icon[3] = 350 + y + 71 + 7
+        if not y == prem_vertprobe_goal:
+            bb_prem_name[1] += y - prem_vertprobe_goal
+            bb_prem_name[3] += y - prem_vertprobe_goal
+            bb_prem_icon[1] += y - prem_vertprobe_goal
+            bb_prem_icon[3] += y - prem_vertprobe_goal
         break
 
 
