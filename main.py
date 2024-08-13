@@ -213,6 +213,12 @@ with open('config.json', 'r') as file:
 system_mode = 'dev' if pyautogui.size().width == 1920 else 'release'
 print('[System] Loading in {} mode'.format(system_mode))
 
+loc_prem_refresh = config[system_mode]['loc_prem_refresh']
+loc_prem_table = config[system_mode]['loc_prem_table']
+
+loc_par_details = config[system_mode]['loc_par_details']
+loc_par_table = config[system_mode]['loc_par_table']
+
 pyautogui.click(loc_mousehide[0])
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0])
 time.sleep(0.2)

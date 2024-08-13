@@ -2,6 +2,10 @@
     "mode": "default",
     "rsa_interval": 3,
     "dev": {
+        "loc_par_table": [1500, 500],
+        "loc_par_details": [1150, 710],
+        "loc_prem_refresh": [120, 70],
+        "loc_prem_table": [600, 600],
         "bb_reload": [[80, 54, 94, 68], [1040, 54, 1054, 68]],
         "loc_reload": [[87, 61], [1047, 61]],
         "bb_prem_vertprobe": [380, 350, 381, 450],
@@ -18,6 +22,11 @@
         "rsa_num_rows": 10
     },
     "release": {
+        "loc_par_table": [1500, 500],
+        "loc_par_details": [1150, 710],
+        "loc_prem_refresh": [120, 70],
+        "loc_prem_table": [600, 600],
+
         "bb_reload": [[80, 57, 94, 71], [763, 57, 777, 71]],
         "loc_reload": [[87, 64], [770, 64]],
 
