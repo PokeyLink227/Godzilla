@@ -93,7 +93,7 @@ def get_pairings():
     if len(trip_ids) == 0:
         return
 
-    winsound.PlaySound('alert_sound.mp3', winsound.SND_LOOP|winsound.SND_ASYNC)
+    winsound.PlaySound('alert_sound.wav', winsound.SND_LOOP|winsound.SND_ASYNC)
     choice = pyautogui.confirm(text=f"found {len(trip_ids)} trips\n" +trip_ids_str, title='Parings Found', buttons=['Highlight Next', 'Ignore All'])
     winsound.PlaySound(None, 0)
 
@@ -144,7 +144,7 @@ def get_premium():
     if len(trip_id_dates) == 0:
         return
 
-    winsound.PlaySound('alert_sound.mp3', winsound.SND_LOOP|winsound.SND_ASYNC)
+    winsound.PlaySound('alert_sound.wav', winsound.SND_LOOP|winsound.SND_ASYNC)
     choice = pyautogui.confirm(text=f"found {len(trip_id_dates)} trips\n" + trips, title='Premium Found', buttons=['Ignore', 'Pause', 'Quit'])
     winsound.PlaySound(None, 0)
 
@@ -196,7 +196,7 @@ def main():
         cycle += 1
 
 #==== main ====
-VERSION = 'v2.0.0'
+VERSION = 'v2.0.1'
 update()
 
 
