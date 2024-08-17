@@ -57,7 +57,7 @@ def ReloadAndWait(window):
     i = 6000
 
     time.sleep(0.5)
-    while ImageChops.difference(ImageGrab.grab(bbox=bb_reload[window]), img_reload_initial[window]).getbbox() and i > 0:
+    while ImageChops.difference(ImageGrab.grab(bbox=bb_reload[0]), img_reload_initial).getbbox() and i > 0:
         print('[System] {} window has not loaded yet, waiting'.format('Left' if window == 0 else 'Right'), str(i), 'more seconds')
         i -= 1
         time.sleep(1)
@@ -196,7 +196,7 @@ def main():
         cycle += 1
 
 #==== main ====
-VERSION = 'v2.0.3'
+VERSION = 'v2.0.4'
 update()
 
 
@@ -219,7 +219,9 @@ loc_prem_table = config[system_mode]['loc_prem_table']
 loc_par_details = config[system_mode]['loc_par_details']
 loc_par_table = config[system_mode]['loc_par_table']
 
-img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0])
+bb_reload = config[system_mode]['bb_reload']
+
+img_reload_initial = ImageGrab.grab(bbox=bb_reload[0])
 time.sleep(0.2)
 
 main()
