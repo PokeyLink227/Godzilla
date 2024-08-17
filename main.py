@@ -52,7 +52,7 @@ def ReloadAndWait(window):
     print('[System] Reloading {} window'.format('Premium' if window == 0 else 'Rsa'))
     pyautogui.click(loc_reload[window])
     time.sleep(0.5)
-    pyautogui.moveTo(loc_mousehide[window])
+    pyautogui.moveTo(loc_prem_table)
 
     i = 6000
 
@@ -196,7 +196,7 @@ def main():
         cycle += 1
 
 #==== main ====
-VERSION = 'v2.0.1'
+VERSION = 'v2.0.3'
 update()
 
 
@@ -219,7 +219,6 @@ loc_prem_table = config[system_mode]['loc_prem_table']
 loc_par_details = config[system_mode]['loc_par_details']
 loc_par_table = config[system_mode]['loc_par_table']
 
-pyautogui.click(loc_mousehide[0])
 img_reload_initial[0] = ImageGrab.grab(bbox=bb_reload[0])
 time.sleep(0.2)
 
