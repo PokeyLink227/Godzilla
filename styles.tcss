@@ -1,0 +1,42 @@
+Button {
+    margin: 0;
+}
+
+#content {
+    layout: vertical;
+}
+
+#top-row {
+    layout: horizontal;
+    height: 85%;
+}
+
+#log {
+    width: 33%;
+}
+
+#ignored-list {
+    width: 34%;
+}
+
+#watch-list {
+    width: 33%;
+}
+
+
+#bottom-row {
+    layout: horizontal;
+    height: 15%;
+}
+
+#stats {
+    width: 33%;
+}
+
+#input-area {
+    width: 60%;
+}
+
+#buttons {
+    width: 7%;
+}
