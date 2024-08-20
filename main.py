@@ -19,7 +19,7 @@ import screen_brightness_control as sbc
 
 re_cap = re.compile(r"CA\s+Open")
 re_intl = re.compile(r"DUB|EDI|LHR|LGW|CDG|AMS")
-re_pair = re.compile(r"(Pairing # (?P<tripid>[\w\d]+) :.*?Crew:\s+(?P<cap>Open|.+?\n)(?=(Pairing|$)))")
+re_pair = re.compile(r"(Pairing # (?P<tripid>[\w\d]+) :.*?Crew:\s+(?P<cap>Open|.+?)(?=(Pairing|$)))")
 par_ignored = ['NONE']
 loc_par_details = [1150, 710]
 loc_par_table = [1500, 500]
@@ -82,7 +82,7 @@ def get_pairings():
     time.sleep(0.5)
 
     data = pyperclip.paste()
-    matches = re.findall(r"(Pairing # (?P<tripid>[\w\d]+) :.*?Crew:\s+(?P<cap>Open|.+?\n)(?=(Pairing|$)))", data, re.S)
+    matches = re.findall(r"(Pairing # (?P<tripid>[\w\d]+) :.*?Crew:\s+(?P<cap>Open|.+?)(?=(Pairing|$)))", data, re.S)
     filtered_list = filter(par_filter, matches)
     trip_ids = [x[1] for x in filtered_list]
     trip_ids_str = '\n'.join(trip_ids)
@@ -196,7 +196,7 @@ def main():
         cycle += 1
 
 #==== main ====
-VERSION = 'v2.0.4'
+VERSION = 'v2.0.5'
 update()
 
 
