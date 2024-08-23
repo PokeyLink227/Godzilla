@@ -13,16 +13,19 @@ Button {
 
 #log {
     width: 33%;
+    height: 100%;
     border: lightblue round;
 }
 
 #ignored-list {
     width: 34%;
+    height: 100%;
     border: lightblue round;
 }
 
 #watch-list {
     width: 33%;
+    height: 100%;
     border: lightblue round;
 }
 
@@ -34,6 +37,7 @@ Button {
 
 #stats {
     width: 33%;
+    height: 100%;
     border: lightblue round;
 }
 
@@ -41,6 +45,7 @@ Button {
     width: 60%;
     height: 100%;
     border: lightblue round;
+    background: rgb(30, 30, 30)
 }
 
 #buttons {

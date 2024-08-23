@@ -1,7 +1,22 @@
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static, Button, Log, Input
 from textual.containers import Container
+from textual.suggester import SuggestFromList, Suggester
 import time
+
+commands = [
+    ("watch", "watch <Trip ID>"),
+    ("unwatch", "unwatch <Trip ID>"),
+    ("ignore", "ignore <Trip ID>"),
+    ("unignore", "unignore <Trip ID>")
+]
+
+class AutoCompletion(Suggester):
+    async def get_suggestion(self, value: str):
+        for pat, txt in commands:
+            if value.startswith(pat[:(min(len(pat), len(value)))]):
+                return txt
+        return None
 
 class GodzillaApp(App):
     """A Textual app to manage stopwatches."""
@@ -36,7 +51,10 @@ class GodzillaApp(App):
         watch.border_title = "Watch List"
         stats = Static(f"Total refreshes: {self.num_refreshes}\n\n", id="stats")
         stats.border_title = "Stats"
-        input_area = Input(placeholder="Enter Command here", id="input-area")
+        input_area = Input(
+            placeholder="Enter Command here",
+            suggester=AutoCompletion(),
+            id="input-area")
         input_area.border_title = "Input"
 
         yield Container(
