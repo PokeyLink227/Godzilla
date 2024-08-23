@@ -13,14 +13,17 @@ Button {
 
 #log {
     width: 33%;
+    border: lightblue round;
 }
 
 #ignored-list {
     width: 34%;
+    border: lightblue round;
 }
 
 #watch-list {
     width: 33%;
+    border: lightblue round;
 }
 
 
@@ -31,10 +34,13 @@ Button {
 
 #stats {
     width: 33%;
+    border: lightblue round;
 }
 
 #input-area {
     width: 60%;
+    height: 100%;
+    border: lightblue round;
 }
 
 #buttons {
