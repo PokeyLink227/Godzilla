@@ -2,13 +2,23 @@ from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static, Button, Log, Input
 from textual.containers import Container
 from textual.suggester import SuggestFromList, Suggester
+from textual import work
 import time
+import asyncio
+
+@work
+async def prog(ctx, out):
+    for i in range(300):
+        out.write_line(f"Iter: {i}")
+        await asyncio.sleep(0.03)
+
 
 commands = [
-    ("watch", "watch <Trip ID>"),
-    ("unwatch", "unwatch <Trip ID>"),
-    ("ignore", "ignore <Trip ID>"),
-    ("unignore", "unignore <Trip ID>")
+    ("watch  ", "watch <Trip ID>"),
+    ("unwatch  ", "unwatch <Trip ID>"),
+    ("ignore  ", "ignore <Trip ID>"),
+    ("unignore  ", "unignore <Trip ID>"),
+    ("start", "start")
 ]
 
 class AutoCompletion(Suggester):
@@ -19,8 +29,6 @@ class AutoCompletion(Suggester):
         return None
 
 class GodzillaApp(App):
-    """A Textual app to manage stopwatches."""
-
     CSS_PATH = "styles.tcss"
     BINDINGS = [("q", "quit", "Quit Application")]
 
@@ -35,9 +43,17 @@ class GodzillaApp(App):
 
     def on_input_submitted(self, event):
         text = self.query_one(Input)
+        if text.value == "start":
+            #prog(self, self.query_one("#log"))
+            None
+        elif text.value == "quit":
+            self.query_one("#log").write_line(text.value)
+            self.action_quit()
         self.query_one("#log").write_line(text.value)
         text.value = ""
 
+    def on_mount(self):
+        prog(self, self.query_one(Log))
 
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
