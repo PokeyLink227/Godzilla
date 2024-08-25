@@ -45,6 +45,12 @@ commands = [
     ("quit", "quit")
 ]
 
+ignored = [
+    "J2348",
+    "J0203",
+    "J2398"
+]
+
 class AutoCompletion(Suggester):
     async def get_suggestion(self, value: str):
         for pat, txt in commands:
@@ -78,13 +84,25 @@ class GodzillaApp(App):
 
     def on_input_submitted(self, event):
         text = self.query_one(Input)
+
         if text.value == "start" or text.value == "resume":
             if not self.monitoring:
                 self.worker_handle = prog(self, self.query_one("#log"))
                 self.query_one("#status-container").remove_class("stopped")
                 self.query_one("#status-container").add_class("running")
+
         elif text.value == "stop" or text.value == "pause":
             self.worker_handle.cancel()
+
+        elif text.value[:7] == "ignore ":
+            ignored.append(text.value[7:])
+            self.query_one("#ignored-list").update(f"{'\n'.join(ignored)}")
+
+        elif text.value[:9] == "unignore ":
+            if text.value[9:] in ignored:
+                ignored.remove(text.value[9:])
+            self.query_one("#ignored-list").update(f"{'\n'.join(ignored)}")
+
         elif text.value == "quit":
             self.query_one("#log").write_line(text.value)
             self.exit()
@@ -102,7 +120,7 @@ class GodzillaApp(App):
         yield Footer()
         log = Log("LOG", id="log")
         log.border_title = "Program Log"
-        ignore = Static("IGNORE", id="ignored-list")
+        ignore = Static(f"{'\n'.join(ignored)}", id="ignored-list")
         ignore.border_title = "Ignored"
         watch = Static("WATCH", id="watch-list")
         watch.border_title = "Watch List"
