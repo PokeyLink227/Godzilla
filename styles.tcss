@@ -42,12 +42,26 @@ Button {
 }
 
 #input-area {
-    width: 60%;
+    width: 57%;
     height: 100%;
     border: lightblue round;
     background: rgb(30, 30, 30)
 }
 
-#buttons {
-    width: 7%;
+#status-container {
+    width: 10%;
+    height: 100%;
+    align: center middle;
+}
+
+#status {
+    text-align: center;
+}
+
+.stopped {
+    background: red;
+}
+
+.running {
+    background: green;
 }
