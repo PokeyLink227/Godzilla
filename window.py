@@ -13,6 +13,11 @@ import pyautogui
 import win32gui
 import re
 
+# GLOBALS
+VERSION = 'v2.0.5'
+
+# FUNCTIONS
+
 async def Wait(seconds):
     target = time.time() + seconds
     while time.time() < target:
@@ -22,14 +27,14 @@ async def Wait(seconds):
 
 @work(exit_on_error=False, exclusive=True)
 async def update(app, log):
-    log.write_line(f'[System] Checking for updates, current version {1}')
+    log.write_line(f'Checking for updates')
     return
 
     url = "https://api.github.com/repos/pokeylink227/godzilla/releases/latest"
     response = requests.get(url)
 
     if response.json()['tag_name'] > VERSION:
-        log.write_line('[System] Update found')
+        log.write_line('Update found')
         r = requests.get(response.json()['assets'][0]['browser_download_url'])
         f = open('update.zip','wb')
         f.write(r.content)
@@ -51,14 +56,16 @@ async def update(app, log):
         os.startfile(f'{dir}/upd.bat')
 
         sys.exit()
-    log.write_line('[System] Program up to date')
+    log.write_line('Program up to date')
 
 @work(exit_on_error=False, exclusive=True)
 async def prog(app, out):
-    out.write_line("[prog] starting prog")
+    out.write_line("Monitoring Started")
+    out.write_line("Waiting 10 Sec")
     app.monitoring = True
+    await asyncio.sleep(10)
+
     app.query_one("#stats").update(f"Total refreshes: {app.num_refreshes}\nRefreshes/Min: {app.num_refreshes / (time.time() - app.app_start) * 60:.2f}\n")
-    app.query_one("#status").update(f"{"Running" if app.monitoring else "Stopped"}")
     while True:
         await Wait(1)
         out.write_line("[prog] Checking the stuff")
@@ -112,14 +119,18 @@ class GodzillaApp(App):
                 self.monitoring = False
                 self.query_one("#stats").update(f"Total refreshes: {self.num_refreshes}\nRefreshes/Min: {self.num_refreshes / (time.time() - self.app_start) * 60:.2f}\n")
                 self.query_one("#log").write_line("Monitoring Stopped")
-                self.query_one("#status-container").add_class("stopped")
                 self.query_one("#status-container").remove_class("running")
+                self.query_one("#status-container").add_class("stopped")
                 self.query_one("#status").update(f"{"Running" if self.monitoring else "Stopped"}")
 
         elif event.worker == self.updater:
             if event.state == WorkerState.SUCCESS:
                 self.worker_handle = prog(self, self.query_one("#log"))
                 self.monitoring = True
+                self.query_one("#status-container").remove_class("stopped")
+                self.query_one("#status-container").add_class("running")
+                self.query_one("#status").update(f"{"Running" if app.monitoring else "Stopped"}")
+
             elif event.state == WorkerState.ERROR:
                 self.panic("[red]Error: [white]Update failed, Check internet connection")
 
@@ -131,9 +142,12 @@ class GodzillaApp(App):
                 self.worker_handle = prog(self, self.query_one("#log"))
                 self.query_one("#status-container").remove_class("stopped")
                 self.query_one("#status-container").add_class("running")
+                self.query_one("#status").update(f"{"Running" if app.monitoring else "Stopped"}")
 
         elif text.value == "stop" or text.value == "pause":
             self.worker_handle.cancel()
+            self.query_one("#status-container").remove_class("running")
+            self.query_one("#status-container").add_class("stopped")
 
         elif text.value[:7] == "ignore ":
             ignored.append(text.value[7:])
@@ -160,8 +174,12 @@ class GodzillaApp(App):
         text.value = ""
 
     def on_mount(self):
+        self.title = "Godzilla"
+        self.sub_title = VERSION
         self.updater = update(self, self.query_one("#log"))
         self.query_one(Input).focus()
+        self.query_one("#status-container").add_class("stopped")
+
 
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
