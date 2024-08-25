@@ -154,11 +154,6 @@ def get_premium():
 def update():
     print(f'[System] Checking for updates, current version {VERSION}')
 
-    dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-    if os.path.exists(f'{dir}\\temp'):
-        shutil.rmtree(f'{dir}\\temp')
-
     url = "https://api.github.com/repos/pokeylink227/godzilla/releases/latest"
     response = requests.get(url)
 
@@ -168,6 +163,11 @@ def update():
         f = open('update.zip','wb')
         f.write(r.content)
         f.close()
+
+        dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+        if os.path.exists(f'{dir}\\temp'):
+            shutil.rmtree(f'{dir}\\temp')
 
         with ZipFile('update.zip') as zpf:
             zpf.extractall()

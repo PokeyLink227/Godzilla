@@ -21,16 +21,49 @@ async def Wait(seconds):
         await asyncio.sleep(0.1)
 
 @work(exit_on_error=False, exclusive=True)
-async def prog(ctx, out):
+async def update(app, log):
+    log.write_line(f'[System] Checking for updates, current version {1}')
+    return
+
+    url = "https://api.github.com/repos/pokeylink227/godzilla/releases/latest"
+    response = requests.get(url)
+
+    if response.json()['tag_name'] > VERSION:
+        log.write_line('[System] Update found')
+        r = requests.get(response.json()['assets'][0]['browser_download_url'])
+        f = open('update.zip','wb')
+        f.write(r.content)
+        f.close()
+
+        dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+        if os.path.exists(f'{dir}\\temp'):
+            shutil.rmtree(f'{dir}\\temp')
+
+        with ZipFile('update.zip') as zpf:
+            zpf.extractall()
+
+        shutil.move(f'{dir}\\main\\main', f'{dir}\\temp')
+
+        f = open(f'{dir}/upd.bat', 'w')
+        f.write(f'@echo off  \ncd {dir}\nrmdir /s /q {dir}\\main  \ntimeout 2 >nul\nrename {dir}\\temp main  \ntimeout 2 >nul\ndel {dir}\\upd.bat') #add absolute paths
+        f.close()
+        os.startfile(f'{dir}/upd.bat')
+
+        sys.exit()
+    log.write_line('[System] Program up to date')
+
+@work(exit_on_error=False, exclusive=True)
+async def prog(app, out):
     out.write_line("[prog] starting prog")
-    ctx.monitoring = True
-    ctx.query_one("#stats").update(f"Total refreshes: {ctx.num_refreshes}\nRefreshes/Min: {ctx.num_refreshes / (time.time() - ctx.app_start) * 60:.2f}\n")
-    ctx.query_one("#status").update(f"{"Running" if ctx.monitoring else "Stopped"}")
+    app.monitoring = True
+    app.query_one("#stats").update(f"Total refreshes: {app.num_refreshes}\nRefreshes/Min: {app.num_refreshes / (time.time() - app.app_start) * 60:.2f}\n")
+    app.query_one("#status").update(f"{"Running" if app.monitoring else "Stopped"}")
     while True:
         await Wait(1)
         out.write_line("[prog] Checking the stuff")
-        ctx.num_refreshes += 1
-        ctx.query_one("#stats").update(f"Total refreshes: {ctx.num_refreshes}\nRefreshes/Min: {ctx.num_refreshes / (time.time() - ctx.app_start) * 60:.2f}\n")
+        app.num_refreshes += 1
+        app.query_one("#stats").update(f"Total refreshes: {app.num_refreshes}\nRefreshes/Min: {app.num_refreshes / (time.time() - app.app_start) * 60:.2f}\n")
 
 
 commands = [
@@ -64,6 +97,7 @@ class GodzillaApp(App):
     num_refreshes = 0
     monitoring = False
     worker_handle = None
+    updater = None
     app_start = time.time()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -73,13 +107,21 @@ class GodzillaApp(App):
             self.query_one("#stats").update(f"{self.num_refreshes}")
 
     def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
-        if event.state == WorkerState.ERROR or event.state == WorkerState.CANCELLED:
-            self.monitoring = False
-            self.query_one("#stats").update(f"Total refreshes: {self.num_refreshes}\nRefreshes/Min: {self.num_refreshes / (time.time() - self.app_start) * 60:.2f}\n")
-            self.query_one("#log").write_line("prog ended")
-            self.query_one("#status-container").add_class("stopped")
-            self.query_one("#status-container").remove_class("running")
-            self.query_one("#status").update(f"{"Running" if self.monitoring else "Stopped"}")
+        if event.worker == self.worker_handle:
+            if event.state == WorkerState.ERROR or event.state == WorkerState.CANCELLED:
+                self.monitoring = False
+                self.query_one("#stats").update(f"Total refreshes: {self.num_refreshes}\nRefreshes/Min: {self.num_refreshes / (time.time() - self.app_start) * 60:.2f}\n")
+                self.query_one("#log").write_line("Monitoring Stopped")
+                self.query_one("#status-container").add_class("stopped")
+                self.query_one("#status-container").remove_class("running")
+                self.query_one("#status").update(f"{"Running" if self.monitoring else "Stopped"}")
+
+        elif event.worker == self.updater:
+            if event.state == WorkerState.SUCCESS:
+                self.worker_handle = prog(self, self.query_one("#log"))
+                self.monitoring = True
+            elif event.state == WorkerState.ERROR:
+                self.panic("[red]Error: [white]Update failed, Check internet connection")
 
     def on_input_submitted(self, event):
         text = self.query_one(Input)
@@ -118,8 +160,7 @@ class GodzillaApp(App):
         text.value = ""
 
     def on_mount(self):
-        self.worker_handle = prog(self, self.query_one("#log"))
-        self.monitoring = True
+        self.updater = update(self, self.query_one("#log"))
         self.query_one(Input).focus()
 
     def compose(self) -> ComposeResult:
