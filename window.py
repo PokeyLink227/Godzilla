@@ -46,10 +46,9 @@ commands = [
 ]
 
 ignored = [
-    "J2348",
-    "J0203",
-    "J2398"
 ]
+
+watch_list = []
 
 class AutoCompletion(Suggester):
     async def get_suggestion(self, value: str):
@@ -102,6 +101,15 @@ class GodzillaApp(App):
             if text.value[9:] in ignored:
                 ignored.remove(text.value[9:])
             self.query_one("#ignored-list").update(f"{'\n'.join(ignored)}")
+
+        elif text.value[:6] == "watch ":
+            watch_list.append(text.value[6:])
+            self.query_one("#watch-list").update(f"{'\n'.join(watch_list)}")
+
+        elif text.value[:8] == "unwatch ":
+            if text.value[8:] in watch_list:
+                watch_list.remove(text.value[8:])
+            self.query_one("#watch-list").update(f"{'\n'.join(watch_list)}")
 
         elif text.value == "quit":
             self.query_one("#log").write_line(text.value)
