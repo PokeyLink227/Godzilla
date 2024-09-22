@@ -23,7 +23,7 @@
     },
     "release": {
         "loc_par_table": [1200, 535],
-        "loc_par_details": [815, 555],
+        "loc_par_details": [815, 535],
         "loc_prem_refresh": [95, 63],
         "loc_prem_table": [400, 260],
 
